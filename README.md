@@ -3,4 +3,4 @@
 # CMSI 2130 - Classwork 2
 A breadth of fresh air
 
-** Allen Boyce Kyle Matton Adi Adi **
+** Allen Boyce Kyle Matton Adi Roitburg**
