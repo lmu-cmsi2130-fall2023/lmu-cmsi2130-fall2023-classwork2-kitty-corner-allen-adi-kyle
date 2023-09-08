@@ -1,6 +1,6 @@
 '''
 CMSI 2130 - Classwork 2
-Author: <PLACE NAME HERE>
+Author: Allen Boyce, Adi Rottenburg, Kyle Matton
 
 Modify only this file as part of your submission, as it will contain all of the logic
 necessary for implementing the breadth-first tree search that solves the basic maze
@@ -31,6 +31,19 @@ class SearchTreeNode:
     
     def __str__(self) -> str:
         return "@: " + str(self.player_loc)
+    
+    #Calls get_path_helper with a new empty list
+    #Returns a stack of strings that list the steps taken to reach this SearchTreeNode.
+    def get_path(self) -> list[str]:
+        return self.get_path_helper([])
+    
+    #NOTE: UNTESTED:
+    #Returns a stack of strings that list the actions taken to reach this SearchTreeNode.
+    def get_path_helper(self, actions: list[str]) -> list[str]:
+        if type(self.parent) is None:
+            return actions
+        list.append(self.action)
+        self.get_path(self, actions.parent)
 
 def pathfind(problem: MazeProblem) -> Optional[list[str]]:
     """
@@ -50,5 +63,30 @@ def pathfind(problem: MazeProblem) -> Optional[list[str]]:
             possible, returns None.
     """
     # TODO: Implement breadth-first tree search!
+
+    """
+        PSEUDOCODE:
+        initialize frontier, initial state node
+        add initial state node to frontier
+        
+        while frontier is not empty:
+            pop expanding node from frontier
+            generate children of expanded node
+            for each generated child:
+                if child is goal:
+                    return solution from child
+                add child to frontier
+        
+        return null (should never reach here for this assignment)
+    """
+    #initialize frontier
+    frontier: list["SearchTreeNode"] = []
+
+    #add initial state node to frontier
+    initial_state_node: "SearchTreeNode" = SearchTreeNode()
+    initial_state_node.player_loc = MazeProblem.get_initial_loc
+    frontier.append(initial_state_node)
+
+
     return None
 
