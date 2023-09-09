@@ -40,12 +40,13 @@ class SearchTreeNode:
     #NOTE: UNTESTED:
     #Returns a stack of strings that list the actions taken to reach this SearchTreeNode.
     def get_path_helper(self, actions: list[str]) -> list[str]:
+        print("Stringed Cheese")
         if type(self.parent) is None:
             return actions
         list.append(self.action)
         self.get_path(self, actions.parent)
 
-def pathfind(problem: MazeProblem) -> Optional[list[str]]:
+def pathfind(problem: "MazeProblem") -> Optional[list[str]]:
     """
     The main workhorse method of the package that performs A* graph search to find the optimal
     sequence of actions that takes the agent from its initial state and shoots all targets in
@@ -83,10 +84,47 @@ def pathfind(problem: MazeProblem) -> Optional[list[str]]:
     frontier: list["SearchTreeNode"] = []
 
     #add initial state node to frontier
-    initial_state_node: "SearchTreeNode" = SearchTreeNode()
-    initial_state_node.player_loc = MazeProblem.get_initial_loc
+    initial_state_node: "SearchTreeNode" = SearchTreeNode
+    initial_state_node.player_loc = problem.get_initial_loc()
     frontier.append(initial_state_node)
+    
+    #while frontier is not empty
+    while len(frontier) > 0:
+        print("bazinga")
+        #pop expanding node from frontier
+        expanding_node: "SearchTreeNode" = frontier.pop(-1)
+        location: tuple[int,int] = expanding_node.player_loc
+
+        
+        transitions: dict = problem.get_transitions(location)
+
+        #Generate Children of Expanded Node
+        children: list["SearchTreeNode"] = []
+        for key in transitions:
+            children.append(SearchTreeNode(transitions[key], key, expanding_node))
+        
+        #For each generated child
+        for child in children:
+            #if child is goal
+            if child.player_loc == problem.get_goal_loc:
+                #return solution from child
+                return child.get_path()
+            #add child to frontier
+            frontier.append(child)
+
+        """
+        for key in transitions:
+
+            child: "SearchTreeNode" = SearchTreeNode
+            child.action = key
+            child.player_loc = transitions[key]
+
+            if child.player_loc == problem.get_goal_loc():
+
+                return child.get_path
+            
+            frontier.append(SearchTreeNode(child.player_loc, child.action, expanding_node))
+        """
 
 
     return None
-
