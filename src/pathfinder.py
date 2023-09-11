@@ -32,6 +32,16 @@ class SearchTreeNode:
     def __str__(self) -> str:
         return "@: " + str(self.player_loc)
     
+    def get_path(self) -> list[str]:
+        path: list[str] = []
+        check_node: "SearchTreeNode"= self
+
+        while(hasattr(check_node, "parent")):
+            path.insert(0, check_node.action)
+            check_node = check_node.parent
+        return path
+
+    """""
     #Calls get_path_helper with a new empty list
     #Returns a stack of strings that list the steps taken to reach this SearchTreeNode.
     def get_path(self) -> list[str]:
@@ -43,10 +53,12 @@ class SearchTreeNode:
         print("Stringed Cheese")
         if type(self.parent) is None:
             return actions
-        list.append(self.action)
+        actions.append(self.action)
         self.get_path(self, actions.parent)
+    """
 
 def pathfind(problem: "MazeProblem") -> Optional[list[str]]:
+    #(problem._maze)
     """
     The main workhorse method of the package that performs A* graph search to find the optimal
     sequence of actions that takes the agent from its initial state and shoots all targets in
@@ -90,7 +102,7 @@ def pathfind(problem: "MazeProblem") -> Optional[list[str]]:
     
     #while frontier is not empty
     while len(frontier) > 0:
-        print("bazinga")
+        #print(str(len(frontier)))
         #pop expanding node from frontier
         expanding_node: "SearchTreeNode" = frontier.pop(-1)
         location: tuple[int,int] = expanding_node.player_loc
@@ -106,11 +118,13 @@ def pathfind(problem: "MazeProblem") -> Optional[list[str]]:
         #For each generated child
         for child in children:
             #if child is goal
-            if child.player_loc == problem.get_goal_loc:
+            if child.player_loc[0] == problem.get_goal_loc()[0] and child.player_loc[1] == problem.get_goal_loc()[1]:
+                #print("FOUND AT " + str(child.player_loc))
+            #if child.player_loc == problem.get_goal_loc:
                 #return solution from child
                 return child.get_path()
             #add child to frontier
-            frontier.append(child)
+            frontier.insert(0, child)
 
         """
         for key in transitions:
