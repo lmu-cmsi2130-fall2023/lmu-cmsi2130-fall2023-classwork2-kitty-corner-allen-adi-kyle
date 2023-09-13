@@ -1,6 +1,6 @@
 '''
 CMSI 2130 - Classwork 2
-Author: Allen Boyce, Adi Rottenburg, Kyle Matton
+Author: Allen Boyce, Adi Roitburg, Kyle Matton
 
 Modify only this file as part of your submission, as it will contain all of the logic
 necessary for implementing the breadth-first tree search that solves the basic maze
@@ -29,36 +29,27 @@ class SearchTreeNode:
     action: str
     parent: Optional["SearchTreeNode"]
     
+    
     def __str__(self) -> str:
         return "@: " + str(self.player_loc)
-    
+
+    #Helper method to get the solution as a list of directions to reach the goal state
     def get_path(self) -> list[str]:
         path: list[str] = []
-        check_node: "SearchTreeNode"= self
+        current_node: SearchTreeNode = self
+        
+        count: int = 0
 
-        while(hasattr(check_node, "parent")):
-            path.insert(0, check_node.action)
-            check_node = check_node.parent
+        while(current_node.parent):
+            path.insert(0, current_node.action)
+            current_node = current_node.parent
+
+    
         return path
 
-    """""
-    #Calls get_path_helper with a new empty list
-    #Returns a stack of strings that list the steps taken to reach this SearchTreeNode.
-    def get_path(self) -> list[str]:
-        return self.get_path_helper([])
-    
-    #NOTE: UNTESTED:
-    #Returns a stack of strings that list the actions taken to reach this SearchTreeNode.
-    def get_path_helper(self, actions: list[str]) -> list[str]:
-        print("Stringed Cheese")
-        if type(self.parent) is None:
-            return actions
-        actions.append(self.action)
-        self.get_path(self, actions.parent)
-    """
 
+    
 def pathfind(problem: "MazeProblem") -> Optional[list[str]]:
-    #(problem._maze)
     """
     The main workhorse method of the package that performs A* graph search to find the optimal
     sequence of actions that takes the agent from its initial state and shoots all targets in
@@ -92,53 +83,39 @@ def pathfind(problem: "MazeProblem") -> Optional[list[str]]:
         
         return null (should never reach here for this assignment)
     """
-    #initialize frontier
-    frontier: list["SearchTreeNode"] = []
 
-    #add initial state node to frontier
-    initial_state_node: "SearchTreeNode" = SearchTreeNode
-    initial_state_node.player_loc = problem.get_initial_loc()
-    frontier.append(initial_state_node)
-    
-    #while frontier is not empty
-    while len(frontier) > 0:
-        #print(str(len(frontier)))
-        #pop expanding node from frontier
-        expanding_node: "SearchTreeNode" = frontier.pop(-1)
-        location: tuple[int,int] = expanding_node.player_loc
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+    #Initialize Frontier
+    frontier: Queue = Queue()
+
+    #Initialize inital node and puts it in Frontier
+    initial_state_node: SearchTreeNode = SearchTreeNode(problem.get_initial_loc(), "", None)
+    frontier.put(initial_state_node)    
+    test: list[str] = ["hi"]
+
+    #While the Frontier has nodes
+    while not frontier.empty():
+
+        #Initializes the node that will eventually generates children, gets that node's location, and uses it to get a dictionary of transitions
+        expanding_node: SearchTreeNode = frontier.get()
+        location: tuple[int, int] = expanding_node.player_loc
+        actions: dict = problem.get_transitions(location)
+
+        #Creates a list of children of the expanding node
+        children: list[SearchTreeNode] = []
+        for key in actions:
+            children.append(SearchTreeNode(actions[key], key, expanding_node))
         
-        transitions: dict = problem.get_transitions(location)
-
-        #Generate Children of Expanded Node
-        children: list["SearchTreeNode"] = []
-        for key in transitions:
-            children.append(SearchTreeNode(transitions[key], key, expanding_node))
+        #Checks if the child reached the goal state. 
+        #If yes: Get the path to reach the solution
+        #If no: Put that child into the frontier
+        for node in children:
+            if (node.player_loc[0] == problem.get_goal_loc()[0]) and (node.player_loc[1] == problem.get_goal_loc()[1]):
+                return node.get_path()
+            else:
+                frontier.put(node)
         
-        #For each generated child
-        for child in children:
-            #if child is goal
-            if child.player_loc[0] == problem.get_goal_loc()[0] and child.player_loc[1] == problem.get_goal_loc()[1]:
-                #print("FOUND AT " + str(child.player_loc))
-            #if child.player_loc == problem.get_goal_loc:
-                #return solution from child
-                return child.get_path()
-            #add child to frontier
-            frontier.insert(0, child)
-
-        """
-        for key in transitions:
-
-            child: "SearchTreeNode" = SearchTreeNode
-            child.action = key
-            child.player_loc = transitions[key]
-
-            if child.player_loc == problem.get_goal_loc():
-
-                return child.get_path
-            
-            frontier.append(SearchTreeNode(child.player_loc, child.action, expanding_node))
-        """
-
-
     return None
+
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------
